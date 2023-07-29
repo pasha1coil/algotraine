@@ -2,6 +2,7 @@ package code
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -197,4 +198,188 @@ func longestCommonPrefix(s []string) string {
 	return pref
 }
 
+// Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.
 
+// The overall run time complexity should be O(log (m+n)).
+
+func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
+	var newArr []int
+	var count float64
+	for _, i := range nums1 {
+		newArr = append(newArr, i)
+	}
+	for _, i := range nums2 {
+		newArr = append(newArr, i)
+	}
+	for i := 0; i < len(newArr)-1; i++ {
+		for j := 0; j < len(newArr)-i-1; j++ {
+			if newArr[j] > newArr[j+1] {
+				newArr[j], newArr[j+1] = newArr[j+1], newArr[j]
+			}
+		}
+	}
+	if len(newArr)%2 == 0 && len(newArr) > 2 {
+		count = (float64(newArr[(len(newArr)/2)-1]) + float64(newArr[(len(newArr)/2)])) / 2
+	} else if len(newArr)%2 != 0 && len(newArr) > 2 {
+		count = float64(newArr[(len(newArr)/2)+(1/2)])
+	} else if len(newArr) == 1 {
+		count = float64(newArr[0])
+	} else if len(newArr) == 2 {
+		count = (float64(newArr[0]) + float64(newArr[1])) / 2
+	}
+	return float64(count)
+}
+
+// The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this: (you may want to display this pattern in a fixed font for better legibility)
+
+// P   A   H   N
+// A P L S I I G
+// Y   I   R
+// And then read line by line: "PAHNAPLSIIGYIR"
+
+// Write the code that will take a string and make this conversion given a number of rows:
+
+// string convert(string s, int numRows);
+
+func convert(s string, numRows int) string {
+	if numRows == 1 {
+		return s
+	}
+
+	resVector := make([]strings.Builder, numRows)
+	mod := (numRows - 1) * 2
+	for i := 0; i < len(s); i++ {
+		index := i % mod
+		if index >= numRows {
+			index = mod - index
+		}
+		resVector[index].WriteByte(s[i])
+	}
+
+	var res strings.Builder
+	for _, r := range resVector {
+		res.WriteString(r.String())
+	}
+	return res.String()
+}
+
+// Given a signed 32-bit integer x, return x with its digits reversed. If reversing x causes the value to go outside the signed 32-bit integer range [-231, 231 - 1], then return 0.
+
+// Assume the environment does not allow you to store 64-bit integers (signed or unsigned).
+
+func reverse(x int) int {
+	var answer int
+	for x != 0 {
+		answer = answer*10 + x%10
+		if answer > 2147483647 || answer < -2147483648 {
+			return 0
+		}
+		fmt.Println(answer, x)
+		x /= 10
+	}
+	return answer
+}
+
+// You are given an integer array height of length n. There are n vertical lines drawn such that the two endpoints of the ith line are (i, 0) and (i, height[i]).
+
+// Find two lines that together with the x-axis form a container, such that the container contains the most water.
+
+// Return the maximum amount of water a container can store.
+
+// Notice that you may not slant the container.
+
+func maxArea(height []int) int {
+	start := 0
+	end := len(height) - 1
+	maxArea := 0
+	for start < end {
+		currArea := end - start
+		if height[start] < height[end] {
+			currArea *= height[start]
+			start++
+		} else {
+			currArea *= height[end]
+			end--
+		}
+		if maxArea < currArea {
+			maxArea = currArea
+		}
+	}
+
+	return maxArea
+}
+
+// Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]] such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0.
+
+// Notice that the solution set must not contain duplicate triplets.
+
+func threeSum(nums []int) [][]int {
+	point := 0
+	var droplist [][]int
+	n := len(nums)
+	sort.Ints(nums)
+	for i := range nums {
+		if i > 0 && nums[i-1] == nums[i] {
+			continue
+		}
+		j, k := i+1, n-1
+		for j < k {
+			sum := nums[i] + nums[j] + nums[k]
+			if sum > point {
+				k--
+			} else if sum < point {
+				j++
+			} else {
+				droplist = append(droplist, []int{nums[i], nums[j], nums[k]})
+				j++
+				for nums[j-1] == nums[j] && j < k {
+					j++
+				}
+			}
+
+		}
+	}
+
+	return droplist
+}
+
+// You are given an array prices where prices[i] is the price of a given stock on the ith day.
+
+// You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
+
+// Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
+
+func maxProfit(prices []int) int {
+	minPrice := prices[0]
+	maxProfit := 0
+	for i := 1; i < len(prices); i++ {
+		price := prices[i]
+		if price < minPrice {
+			minPrice = price
+		} else {
+			profit := price - minPrice
+			if profit > maxProfit {
+				maxProfit = profit
+			}
+		}
+	}
+	return maxProfit
+}
+
+// Given an integer array nums and an integer val, remove all occurrences of val in nums in-place. The order of the elements may be changed. Then return the number of elements in nums which are not equal to val.
+
+// Consider the number of elements in nums which are not equal to val be k, to get accepted, you need to do the following things:
+
+// Change the array nums such that the first k elements of nums contain the elements which are not equal to val. The remaining elements of nums are not important as well as the size of nums.
+// Return k.
+
+func removeElement(nums []int, val int) int {
+	count := 0
+	for _, i := range nums {
+		if i != val {
+			nums[count] = i
+			count++
+		}
+	}
+	return count
+}
