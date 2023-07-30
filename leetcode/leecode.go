@@ -383,3 +383,123 @@ func removeElement(nums []int, val int) int {
 	}
 	return count
 }
+
+// Given a string containing digits from 2-9 inclusive, return all possible letter combinations that the number could represent. Return the answer in any order.
+
+// A mapping of digits to letters (just like on the telephone buttons) is given below. Note that 1 does not map to any letters.
+
+func letterCombinations(digits string) []string {
+	if len(digits) == 0 {
+		return nil
+	}
+	class := map[rune]string{
+		'2': "abc",
+		'3': "def",
+		'4': "ghi",
+		'5': "jkl",
+		'6': "mno",
+		'7': "pqrs",
+		'8': "tuv",
+		'9': "wxyz",
+	}
+	size := 1
+	for _, d := range digits {
+		size *= len(class[d])
+	}
+	res := make([]string, size)
+	for _, d := range digits {
+		now := class[d]
+		size /= len(now)
+		for i := range res {
+			res[i] += string(now[(i/size)%len(now)])
+			fmt.Println(res[i])
+		}
+	}
+	return res
+
+}
+
+// Given the head of a linked list, remove the nth node from the end of the list and return its head.
+
+// Definition for singly-linked list.
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func removeNthFromEnd(head *ListNode, n int) *ListNode {
+	result := &ListNode{Next: head}
+	slow, fast := result, result
+
+	for i := 0; i <= n; i++ {
+		fast = fast.Next
+		fmt.Println("цикл", fast)
+	}
+	fmt.Println("vne cicle", fast)
+
+	for fast != nil {
+		fast = fast.Next
+		slow = slow.Next
+		fmt.Println(fast)
+		fmt.Println(slow)
+	}
+
+	slow.Next = slow.Next.Next
+
+	return result.Next
+
+}
+
+//You are given the heads of two sorted linked lists list1 and list2.
+
+// Merge the two lists into one sorted list. The list should be made by splicing together the nodes of the first two lists.
+
+// Return the head of the merged linked list.
+// Definition for singly-linked list.
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func mergeTwoLists(list1 *ListNode, list2 *ListNode) *ListNode {
+	result := &ListNode{}
+	point := result
+	for list1 != nil || list2 != nil {
+		if list1 == nil {
+			point.Next = list2
+			list2 = nil
+			continue
+		}
+		if list2 == nil {
+			point.Next = list1
+			list1 = nil
+			continue
+		}
+
+		if list1.Val > list2.Val {
+			point.Next = list2
+			point, list2 = point.Next, list2.Next
+		} else {
+			point.Next = list1
+			point, list1 = point.Next, list1.Next
+		}
+	}
+	return result.Next
+}
+
+// Given an integer array nums sorted in non-decreasing order, remove the duplicates in-place such that each unique element appears only once. The relative order of the elements should be kept the same. Then return the number of unique elements in nums.
+
+// Consider the number of unique elements of nums to be k, to get accepted, you need to do the following things:
+
+// Change the array nums such that the first k elements of nums contain the unique elements in the order they were present in nums initially. The remaining elements of nums are not important as well as the size of nums.
+// Return k.
+func removeDuplicates(nums []int) int {
+	i := 0
+	for j, _ := range nums {
+		if nums[i] != nums[j] {
+			i++
+			nums[i] = nums[j]
+		}
+	}
+	return i + 1
+}
