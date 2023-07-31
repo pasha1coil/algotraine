@@ -679,3 +679,42 @@ func majorityElement(nums []int) int {
 
 	return nums[0]
 }
+
+// Given the head of a sorted linked list, delete all duplicates such that each element appears only once. Return the linked list sorted as well.
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func deleteDuplicates(head *ListNode) *ListNode {
+	now := head
+	for now != nil && now.Next != nil {
+		if now.Val == now.Next.Val {
+			now.Next = now.Next.Next
+		} else {
+			now = now.Next
+		}
+	}
+	return head
+
+}
+
+//Given an integer numRows, return the first numRows of Pascal's triangle.
+
+func generate(numRows int) [][]int {
+	arr := [][]int{}
+	for i := 0; i < numRows; i++ {
+		for j := 0; j < i+1; j++ {
+			if j == 0 {
+				arr = append(arr, []int{1})
+			} else {
+				if j == i {
+					arr[i] = append(arr[i], 1)
+				} else {
+					arr[i] = append(arr[i], arr[i-1][j]+arr[i-1][j-1])
+				}
+			}
+		}
+	}
+	return arr
+}
