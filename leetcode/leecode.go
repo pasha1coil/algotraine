@@ -503,3 +503,179 @@ func removeDuplicates(nums []int) int {
 	}
 	return i + 1
 }
+
+// Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+
+// You must write an algorithm with O(log n) runtime complexity.
+
+func searchInsert(nums []int, target int) int {
+	res := 0
+	for number, i := range nums {
+		if i >= target {
+			return number
+		} else {
+			res = number
+		}
+	}
+	return res + 1
+}
+
+// Given a string s consisting of words and spaces, return the length of the last word in the string.
+
+// A word is a maximal
+// substring
+//  consisting of non-space characters only.
+
+func lengthOfLastWord(s string) int {
+	newstr := strings.TrimRight(s, " ")
+	arr := strings.Split(newstr, " ")
+	return (len(arr[len(arr)-1]))
+}
+
+// You are given a large integer represented as an integer array digits, where each digits[i] is the ith digit of the integer. The digits are ordered from most significant to least significant in left-to-right order. The large integer does not contain any leading 0's.
+
+// Increment the large integer by one and return the resulting array of digits.
+
+func plusOne(digits []int) []int {
+
+	for i := len(digits) - 1; i >= 0; i-- {
+		if digits[i] < 9 {
+			digits[i] = digits[i] + 1
+			break
+		}
+		digits[i] = 0
+	}
+	if digits[0] == 0 {
+		digits = append([]int{1}, digits...)
+	}
+	return digits
+}
+
+// Given a non-negative integer x, return the square root of x rounded down to the nearest integer. The returned integer should be non-negative as well.
+
+// You must not use any built-in exponent function or operator.
+
+// For example, do not use pow(x, 0.5) in c++ or x ** 0.5 in python.
+
+func mySqrt(x int) int {
+	first := 0
+	second := x
+
+	for first <= second {
+		midle := (first + second) / 2
+		if midle*midle == x {
+			return midle
+		} else if midle*midle < x {
+			first = midle + 1
+		} else {
+			second = midle - 1
+		}
+		fmt.Println(first)
+	}
+	return second
+}
+
+// You are climbing a staircase. It takes n steps to reach the top.
+
+// Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+
+func climbStairs(n int) int {
+	if n < 3 {
+		return n
+	}
+
+	nowS, nextS := 2, 3
+	for i := 3; i <= n; i++ {
+		nowS, nextS = nextS, nowS+nextS
+	}
+
+	return nowS
+}
+
+// Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+
+// An input string is valid if:
+
+// Open brackets must be closed by the same type of brackets.
+// Open brackets must be closed in the correct order.
+// Every close bracket has a corresponding open bracket of the same type.
+
+func isValid(s string) bool {
+	if s == "" {
+		return true
+	}
+
+	sLen := len(s)
+	s2 := strings.ReplaceAll(s, "()", "")
+	fmt.Println("1", s2)
+	s2 = strings.ReplaceAll(s2, "[]", "")
+	fmt.Println("2", s2)
+	s2 = strings.ReplaceAll(s2, "{}", "")
+	fmt.Println("3", s2)
+	if len(s2) == sLen {
+		return false
+	}
+
+	return isValid(s2)
+}
+
+// Given an integer array nums, return true if any value appears at least twice in the array, and return false if every element is distinct.
+
+func containsDuplicate(nums []int) bool {
+	res := ""
+	sort.Ints(nums)
+	fmt.Println(nums)
+	for number, i := range nums {
+		val := i
+		for j := number; j < len(nums); j++ {
+			if j != number {
+				if nums[j] == val {
+					res = res + "a"
+					break
+				}
+			}
+
+		}
+	}
+	return len(res) != 0
+}
+
+// You are given two integer arrays nums1 and nums2, sorted in non-decreasing order, and two integers m and n, representing the number of elements in nums1 and nums2 respectively.
+
+// Merge nums1 and nums2 into a single array sorted in non-decreasing order.
+
+// The final sorted array should not be returned by the function, but instead be stored inside the array nums1. To accommodate this, nums1 has a length of m + n, where the first m elements
+// denote the elements that should be merged, and the last n elements are set to 0 and should be ignored. nums2 has a length of n.
+
+func merge(nums1 []int, m int, nums2 []int, n int) {
+	var numbers []int
+	for i := m; i < len(nums1); i++ {
+		numbers = append(numbers, i)
+	}
+	for j := 0; j <= n-1; j++ {
+		nums1[numbers[j]] = nums2[j]
+	}
+	sort.Ints(nums1)
+}
+
+// Given an array nums of size n, return the majority element.
+
+// The majority element is the element that appears more than ⌊n / 2⌋ times. You may assume that the majority element always exists in the array.
+
+func majorityElement(nums []int) int {
+	class := make(map[int]int)
+
+	for _, i := range nums {
+		class[i]++
+	}
+	fmt.Println(class)
+
+	len := (len(nums) + 1) / 2
+	for num, j := range class {
+		if j >= len {
+			return num
+		}
+	}
+
+	return nums[0]
+}
