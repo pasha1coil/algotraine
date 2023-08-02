@@ -5,6 +5,7 @@ import (
 	"math"
 	"sort"
 	"strings"
+	"unicode"
 )
 
 // Implement pow(x, n), which calculates x raised to the power n (i.e., xn)
@@ -791,4 +792,92 @@ func myAtoi(s string) int {
 
 func stepfunction(c byte) bool {
 	return c >= '0' && c <= '9'
+}
+
+// Given a linked list, swap every two adjacent nodes and return its head.
+// You must solve the problem without modifying the values in the list's nodes (i.e., only nodes themselves may be changed.)
+
+// Definition for singly-linked list.
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func swapPairs(head *ListNode) *ListNode {
+	if head == nil || head.Next == nil {
+		return head
+	}
+	head, head.Next, head.Next.Next = head.Next, swapPairs(head.Next.Next), head
+	return head
+}
+
+// An ugly number is a positive integer whose prime factors are limited to 2, 3, and 5.
+
+// Given an integer n, return true if n is an ugly number.
+
+func isUgly(n int) bool {
+	if n <= 0 {
+		return false
+	}
+
+	for n%2 == 0 {
+		n /= 2
+	}
+
+	for n%3 == 0 {
+		n /= 3
+	}
+
+	for n%5 == 0 {
+		n /= 5
+	}
+
+	return n == 1
+}
+
+// A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.
+
+// Given a string s, return true if it is a palindrome, or false otherwise.
+
+func isPalindrome(s string) bool {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		fmt.Println(unicode.IsLetter(rune(s[i])))
+		for i < j && !(unicode.IsLetter(rune(s[i])) || unicode.IsDigit(rune(s[i]))) {
+			i++
+		}
+		for i < j && !(unicode.IsLetter(rune(s[j])) || unicode.IsDigit(rune(s[j]))) {
+			j--
+		}
+		if i == j {
+			break
+		}
+		if unicode.ToLower(rune(s[i])) != unicode.ToLower(rune(s[j])) {
+			return false
+		}
+	}
+	return true
+}
+
+// Given a string columnTitle that represents the column title as appears in an Excel sheet, return its corresponding column number.
+func titleToNumber(columnTitle string) int {
+	result := 0
+	for number, i := range columnTitle {
+		if len(columnTitle) != 1 {
+			result = result + int(math.Pow(26.0, float64(len(columnTitle)-number-1)))*int(i-64)
+		} else {
+			result = int(i - 64)
+		}
+	}
+	return result
+}
+
+// Given a non-empty array of integers nums, every element appears twice except for one. Find that single one.
+
+// You must implement a solution with a linear runtime complexity and use only constant extra space.
+
+func singleNumber(nums []int) int {
+	for i := 1; i < len(nums); i++ {
+		nums[0] ^= nums[i]
+	}
+	return nums[0]
 }
