@@ -881,3 +881,51 @@ func singleNumber(nums []int) int {
 	}
 	return nums[0]
 }
+
+//Given an integer num, repeatedly add all its digits until the result has only one digit, and return it.
+
+func addDigits(num int) int {
+	if num == 0 {
+		return 0
+	}
+	if num%9 == 0 {
+		return 9
+	}
+	return num % 9
+}
+
+// There are n employees in a company, numbered from 0 to n - 1. Each employee i has worked for hours[i] hours in the company.
+
+// The company requires each employee to work for at least target hours.
+
+// You are given a 0-indexed array of non-negative integers hours of length n and a non-negative integer target.
+
+// Return the integer denoting the number of employees who worked at least target hours.
+
+func numberOfEmployeesWhoMetTarget(hours []int, target int) int {
+	res := 0
+	for _, i := range hours {
+		if i >= target {
+			res = res + 1
+		}
+	}
+	return res
+}
+
+// //
+func intersection(nums1 []int, nums2 []int) []int {
+	class := make(map[int]int)
+	for _, i := range nums1 {
+		for _, j := range nums2 {
+			if i == j {
+				class[i]++
+			}
+		}
+	}
+	fmt.Println(class)
+	var res []int
+	for j, _ := range class {
+		res = append(res, j)
+	}
+	return res
+}
