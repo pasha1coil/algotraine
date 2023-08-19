@@ -9,7 +9,6 @@ import (
 )
 
 // Implement pow(x, n), which calculates x raised to the power n (i.e., xn)
-
 func myPow(x float64, n int) float64 {
 	answer := x
 	if n < 0 {
@@ -928,4 +927,26 @@ func intersection(nums1 []int, nums2 []int) []int {
 		res = append(res, j)
 	}
 	return res
+}
+
+// You are given an integer array nums consisting of n elements, and an integer k.
+
+// Find a contiguous subarray whose length is equal to k that has the maximum average value and return this value. Any answer with a calculation error less than 10-5 will be accepted.
+
+func findMaxAverage(nums []int, k int) float64 {
+	var result, numerator float64 = -797693134862315708145274237, 0
+	var l = 0
+	divider := float64(k)
+	for i := 0; i < len(nums); i++ {
+		numerator += float64(nums[i])
+		if i < k-1 {
+			continue
+		}
+		for (i-l)+1 > k {
+			numerator -= float64(nums[l])
+			l++
+		}
+		result = math.Max(result, numerator/divider)
+	}
+	return result
 }
