@@ -950,3 +950,132 @@ func findMaxAverage(nums []int, k int) float64 {
 	}
 	return result
 }
+
+// A permutation of an array of integers is an arrangement of its members into a sequence or linear order.
+
+// For example, for arr = [1,2,3], the following are all the permutations of arr: [1,2,3], [1,3,2], [2, 1, 3], [2, 3, 1], [3,1,2], [3,2,1].
+// The next permutation of an array of integers is the next lexicographically greater permutation of its integer. More formally, if all the permutations of the array are sorted in one container according to their lexicographical order, then the next permutation of that array is the permutation that follows it in the sorted container. If such arrangement is not possible, the array must be rearranged as the lowest possible order (i.e., sorted in ascending order).
+
+// For example, the next permutation of arr = [1,2,3] is [1,3,2].
+// Similarly, the next permutation of arr = [2,3,1] is [3,1,2].
+// While the next permutation of arr = [3,2,1] is [1,2,3] because [3,2,1] does not have a lexicographical larger rearrangement.
+// Given an array of integers nums, find the next permutation of nums.
+
+// The replacement must be in place and use only constant extra memory.
+
+// Example 1:
+
+// Input: nums = [1,2,3]
+// Output: [1,3,2]
+// Example 2:
+
+// Input: nums = [3,2,1]
+// Output: [1,2,3]
+// Example 3:
+
+// Input: nums = [1,1,5]
+// Output: [1,5,1]
+
+func nextPermutation(nums []int) {
+	i := len(nums) - 1
+	for ; i > 0; i-- {
+		if nums[i-1] < nums[i] {
+			for j := len(nums) - 1; j > i-1; j-- {
+				if nums[i-1] < nums[j] {
+					nums[i-1], nums[j] = nums[j], nums[i-1]
+					break
+				}
+			}
+			break
+		}
+	}
+	left, right := i, len(nums)-1
+	for ; left < right; left, right = left+1, right-1 {
+		nums[left], nums[right] = nums[right], nums[left]
+	}
+	fmt.Println(nums)
+}
+
+// You are given two strings s1 and s2, both of length 4, consisting of lowercase English letters.
+
+// You can apply the following operation on any of the two strings any number of times:
+
+// Choose any two indices i and j such that j - i = 2, then swap the two characters at those indices in the string.
+// Return true if you can make the strings s1 and s2 equal, and false otherwise.
+
+func canBeEqual(s1 string, s2 string) bool {
+	return s1 == s2 ||
+		check(s1, 0, 2) == s2 ||
+		check(s1, 1, 3) == s2 ||
+		check(check(s1, 0, 2), 1, 3) == s2
+}
+
+func check(s1 string, i, j int) string {
+	news1 := []byte(s1)
+	news1[i], news1[j] = news1[j], news1[i]
+	return string(news1)
+}
+
+// There is an integer array nums sorted in ascending order (with distinct values).
+
+// Prior to being passed to your function, nums is possibly rotated at an unknown pivot index k (1 <= k < nums.length) such that the resulting array is [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]] (0-indexed). For example, [0,1,2,4,5,6,7] might be rotated at pivot index 3 and become [4,5,6,7,0,1,2].
+
+// Given the array nums after the possible rotation and an integer target, return the index of target if it is in nums, or -1 if it is not in nums.
+
+// You must write an algorithm with O(log n) runtime complexity.
+
+func search(nums []int, target int) int {
+	for num, value := range nums {
+		if value == target {
+			return num
+		}
+	}
+	return -1
+}
+
+// Given head, the head of a linked list, determine if the linked list has a cycle in it.
+
+// There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the next pointer. Internally, pos is used to denote the index of the node that tail's next pointer is connected to. Note that pos is not passed as a parameter.
+
+// Return true if there is a cycle in the linked list. Otherwise, return false.
+
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func hasCycle(head *ListNode) bool {
+	slow_pointer, fast_pointer := head, head
+	for fast_pointer != nil && fast_pointer.Next != nil {
+		slow_pointer = slow_pointer.Next
+		fast_pointer = fast_pointer.Next.Next
+		if slow_pointer == fast_pointer {
+			return true
+		}
+	}
+	return false
+}
+
+// Given two strings s and t, return true if t is an anagram of s, and false otherwise.
+
+// An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+
+func isAnagram(s string, t string) bool {
+	if len(s) != len(t) {
+		return false
+	}
+	dict1 := make(map[string]int)
+	dict2 := make(map[string]int)
+	for i := 0; i < len(s); i++ {
+		dict1[string(s[i])]++
+	}
+	for i := 0; i < len(s); i++ {
+		dict2[string(t[i])]++
+	}
+	for i := 0; i < len(s); i++ {
+		if dict1[string(s[i])] != dict2[string(s[i])] {
+			return false
+		}
+	}
+	return true
+}
