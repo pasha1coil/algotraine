@@ -1079,3 +1079,262 @@ func isAnagram(s string, t string) bool {
 	}
 	return true
 }
+
+// You are given an m x n integer matrix matrix with the following two properties:
+
+// Each row is sorted in non-decreasing order.
+// The first integer of each row is greater than the last integer of the previous row.
+// Given an integer target, return true if target is in matrix or false otherwise.
+
+// You must write a solution in O(log(m * n)) time complexity.
+
+func searchMatrix(matrix [][]int, target int) bool {
+	for i := 0; i < len(matrix); i++ {
+		for j := 0; j < len(matrix[i]); j++ {
+			if target == matrix[i][j] {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// Given an integer array nums and an integer k, return the kth largest element in the array.
+
+// Note that it is the kth largest element in the sorted order, not the kth distinct element.
+
+// Can you solve it without sorting?
+
+// with sorting :(
+
+func findKthLargest(nums []int, k int) int {
+	return nums[len(nums)-1]
+
+}
+
+func quicksort(arr []int) []int {
+	if len(arr) < 2 {
+		return arr
+	}
+	left := 0
+	right := len(arr) - 1
+	target := (right + left) / 2
+	arr[target], arr[right] = arr[right], arr[target]
+	for num, _ := range arr {
+		if arr[num] < arr[right] {
+			arr[left], arr[num] = arr[num], arr[left]
+			left++
+		}
+	}
+	arr[left], arr[right] = arr[right], arr[left]
+	quicksort(arr[:left])
+	quicksort(arr[left+1:])
+	return arr
+}
+
+// There is an integer array nums sorted in non-decreasing order (not necessarily with distinct values).
+
+// Before being passed to your function, nums is rotated at an unknown pivot index k (0 <= k < nums.length) such that the resulting array is [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]] (0-indexed). For example, [0,1,2,4,4,4,5,6,6,7] might be rotated at pivot index 5 and become [4,5,6,6,7,0,1,2,4,4].
+
+// Given the array nums after the rotation and an integer target, return true if target is in nums, or false if it is not in nums.
+
+// You must decrease the overall operation steps as much as possible.
+
+func search(nums []int, target int) bool {
+	dict := make(map[int]bool)
+	for _, val := range nums {
+		dict[val] = true
+	}
+	return dict[target]
+}
+
+// Given an array of integers nums sorted in non-decreasing order, find the starting and ending position of a given target value.
+
+// If target is not found in the array, return [-1, -1].
+
+// You must write an algorithm with O(log n) runtime complexity.
+
+func searchRange(nums []int, target int) []int {
+	var arr []int
+	if len(nums) == 0 {
+		arr2 := []int{-1, -1}
+		return arr2
+	} else if len(nums) == 1 && nums[0] == target {
+		arr3 := []int{0, 0}
+		return arr3
+	}
+	first := binarysearch(nums, target)
+	arr = append(arr, first)
+	if first >= 0 {
+		arr = append(arr, binarysearch2(nums, target))
+	} else {
+		arr = append(arr, -1)
+	}
+	return arr
+}
+
+func binarysearch(arr []int, target int) int {
+	left := 0
+	right := len(arr) - 1
+	for left <= right {
+		val := left
+		if arr[val] < target {
+			left = val + 1
+		} else if arr[val] > target {
+			right = val - 1
+		} else {
+			return val
+		}
+	}
+	return -1
+}
+
+func binarysearch2(arr []int, target int) int {
+	left := 0
+	right := len(arr) - 1
+	for left <= right {
+		val := right
+		if arr[val] < target {
+			left = val + 1
+		} else if arr[val] > target {
+			right = val - 1
+		} else {
+			return val
+		}
+	}
+	return -1
+}
+
+//УЧИТЬ
+// Determine if a 9 x 9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
+
+// Each row must contain the digits 1-9 without repetition.
+// Each column must contain the digits 1-9 without repetition.
+// Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without repetition.
+// Note:
+
+// A Sudoku board (partially filled) could be valid but is not necessarily solvable.
+// Only the filled cells need to be validated according to the mentioned rules.
+
+func isValidSudoku(board [][]byte) bool {
+	rows := [9][9]bool{}
+	column := [9][9]bool{}
+	pols := [3][3][9]bool{}
+	for i := 0; i < 9; i++ {
+		for j := 0; j < 9; j++ {
+			kletka := board[i][j]
+			if kletka == '.' {
+				continue
+			}
+			chislo := int(kletka-'0') - 1
+
+			if rows[i][chislo] || column[j][chislo] || pols[i/3][j/3][chislo] {
+				return false
+			}
+
+			rows[i][chislo] = true
+			column[j][chislo] = true
+			pols[i/3][j/3][chislo] = true
+		}
+	}
+	return true
+}
+
+// Given an array nums of distinct integers, return all the possible permutations. You can return the answer in any order.
+
+func permute(nums []int) [][]int {
+	if len(nums) == 1 {
+		return [][]int{nums}
+	}
+	if len(nums) == 2 {
+		return [][]int{{nums[0], nums[1]}, {nums[1], nums[0]}}
+	}
+	var perms [][]int
+	for i := range nums {
+		//i is the elem we skip in subtask
+		//permute([2,3]) returns [[2,3],[3,2]]
+		for _, p := range permute(append(append([]int{}, nums[:i]...), nums[i+1:]...)) {
+			perms = append(perms, append([]int{nums[i]}, p...))
+			//[ [1,2,3], [1,3,2] ]
+		}
+	}
+	return perms
+}
+
+//Given an m x n matrix, return all elements of the matrix in spiral order.
+
+func spiralOrder(matrix [][]int) []int {
+	if matrix == nil && len(matrix) == 0 {
+		return []int{}
+	}
+	var res []int
+	top := 0
+	bottom := len(matrix) - 1
+	left := 0
+	right := len(matrix[0]) - 1
+	for {
+		// вправо
+		for i := left; i <= right; i++ {
+			res = append(res, matrix[top][i])
+		}
+		top++
+		if top > bottom {
+			break
+		}
+
+		// вниз
+		for i := top; i <= bottom; i++ {
+			res = append(res, matrix[i][right])
+		}
+		right--
+		if left > right {
+			break
+		}
+
+		// влево
+		for i := right; i >= left; i-- {
+			res = append(res, matrix[bottom][i])
+		}
+		bottom--
+		if top > bottom {
+			break
+		}
+
+		// вверх
+		for i := bottom; i >= top; i-- {
+			res = append(res, matrix[i][left])
+		}
+		left++
+		if left > right {
+			break
+		}
+	}
+	return res
+}
+
+// Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals,
+//  and return an array of the non-overlapping intervals that cover all the intervals in the input.
+
+func merge(intervals [][]int) [][]int {
+	if len(intervals) <= 1 {
+		return intervals
+	}
+
+	sort.Slice(intervals, func(i, j int) bool {
+		return intervals[i][0] < intervals[j][0]
+	})
+	fmt.Println(intervals)
+
+	mergedIntervals := make([][]int, 0, len(intervals))
+	mergedIntervals = append(mergedIntervals, intervals[0])
+
+	for _, interval := range intervals[1:] {
+		if top := mergedIntervals[len(mergedIntervals)-1]; interval[0] > top[1] {
+			mergedIntervals = append(mergedIntervals, interval)
+		} else if interval[1] > top[1] {
+			top[1] = interval[1]
+		}
+	}
+
+	return mergedIntervals
+}
