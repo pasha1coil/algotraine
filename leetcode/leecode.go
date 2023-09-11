@@ -1,8 +1,10 @@
 package code
 
 import (
+	"container/heap"
 	"fmt"
 	"math"
+	"path"
 	"sort"
 	"strings"
 	"unicode"
@@ -1337,4 +1339,387 @@ func merge(intervals [][]int) [][]int {
 	}
 
 	return mergedIntervals
+}
+
+// You are in a city that consists of n intersections numbered from 0 to n - 1 with bi-directional roads between some intersections. The inputs are generated such that you can reach any intersection from any other intersection and that there is at most one road between any two intersections.
+
+// You are given an integer n and a 2D integer array roads where roads[i] = [ui, vi, timei] means that there is a road between intersections ui and vi that takes timei minutes to travel. You want to know in how many ways you can travel from intersection 0 to intersection n - 1 in the shortest amount of time.
+
+// Return the number of ways you can arrive at your destination in the shortest amount of time. Since the answer may be large, return it modulo 109 + 7.
+
+type Road struct {
+	u, v, time int
+}
+
+type Node struct {
+	index, dist, ways int
+}
+
+type PriorityQueue []Node
+
+func (pq PriorityQueue) Len() int { // длина
+	return len(pq)
+}
+
+func (pq PriorityQueue) Less(i, j int) bool { // проверка на меньше
+	return pq[i].dist < pq[j].dist
+}
+
+func (pq PriorityQueue) Swap(i, j int) { // замена
+	pq[i], pq[j] = pq[j], pq[i]
+}
+
+func (pq *PriorityQueue) Push(x interface{}) { // запись в список
+	node := x.(Node)
+	*pq = append(*pq, node)
+}
+
+func (pq *PriorityQueue) Pop() interface{} { // удаление по индексу
+	old := *pq
+	n := len(old)
+	node := old[n-1]
+	*pq = old[0 : n-1]
+	return node
+}
+
+func findNumberOfWays(n int, roads [][]int) int {
+	adjList := make([][]Road, n)
+	for _, road := range roads {
+		u, v, time := road[0], road[1], road[2]
+		adjList[u] = append(adjList[u], Road{u, v, time})
+		adjList[v] = append(adjList[v], Road{v, u, time})
+	}
+
+	dist := make([]int, n)
+	ways := make([]int, n)
+	vis := make([]bool, n)
+
+	dist[0] = 0
+	ways[0] = 1
+
+	pq := &PriorityQueue{}
+	heap.Push(pq, Node{0, 0, 1})
+
+	for pq.Len() > 0 {
+		node := heap.Pop(pq).(Node)
+		u := node.index
+		fmt.Println(vis)
+
+		if vis[u] {
+			continue
+		}
+
+		vis[u] = true
+
+		for _, road := range adjList[u] {
+			v := road.v
+			time := road.time
+
+			if dist[u]+time < dist[v] || dist[v] == 0 {
+				dist[v] = dist[u] + time
+				ways[v] = ways[u]
+				heap.Push(pq, Node{v, dist[v], ways[v]})
+			} else if dist[u]+time == dist[v] {
+				ways[v] = (ways[v] + ways[u]) % (1e9 + 7)
+			}
+		}
+	}
+
+	return ways[n-1]
+}
+
+func countPaths(n int, roads [][]int) int {
+	return findNumberOfWays(n, roads)
+}
+
+// Suppose an array of length n sorted in ascending order is rotated between 1 and n times. For example, the array nums = [0,1,2,4,5,6,7] might become:
+
+// [4,5,6,7,0,1,2] if it was rotated 4 times.
+// [0,1,2,4,5,6,7] if it was rotated 7 times.
+// Notice that rotating an array [a[0], a[1], a[2], ..., a[n-1]] 1 time results in the array [a[n-1], a[0], a[1], a[2], ..., a[n-2]].
+
+// Given the sorted rotated array nums of unique elements, return the minimum element of this array.
+
+// You must write an algorithm that runs in O(log n) time.
+
+func findMin(nums []int) int {
+	quicksort(nums)
+	return nums[0]
+}
+
+func quicksort(arr []int) []int {
+	if len(arr) < 2 {
+		return arr
+	}
+	left := 0
+	right := len(arr) - 1
+
+	target := (left + right) / 2
+	arr[target], arr[right] = arr[right], arr[target]
+	for i := range arr {
+		if arr[i] < arr[right] {
+			arr[left], arr[i] = arr[i], arr[left]
+			left++
+		}
+	}
+	arr[left], arr[right] = arr[right], arr[left]
+	quicksort(arr[:left])
+	quicksort(arr[left+1:])
+	return arr
+}
+
+// Given the root of a complete binary tree, return the number of the nodes in the tree.
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func countNodes(root *TreeNode) int {
+	var count int
+	if root == nil {
+		return count
+	}
+	count++
+	stack := []*TreeNode{root}
+
+	for len(stack) != 0 {
+		node := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if node.Left != nil {
+			count++
+			stack = append(stack, node.Left)
+		}
+		if node.Right != nil {
+			count++
+			stack = append(stack, node.Right)
+		}
+	}
+	return count
+}
+
+// Given an array of integers nums containing n + 1 integers where each integer is in the range [1, n] inclusive.
+
+// There is only one repeated number in nums, return this repeated number.
+
+// You must solve the problem without modifying the array nums and uses only constant extra space.
+
+func findDuplicate(nums []int) int {
+	dict := make(map[int]int)
+	for _, i := range nums {
+		dict[i]++
+	}
+	for _, i := range nums {
+		if dict[i] > 1 {
+			return i
+		}
+	}
+	return 1
+}
+
+// Given two integer arrays nums1 and nums2, return an array of their intersection. Each element in the result must appear
+// as many times as it shows in both arrays and you may return the result in any order.
+
+func intersect(nums1 []int, nums2 []int) []int {
+	m := make(map[int]int)
+	array := make([]int, 0)
+	for i := 0; i < len(nums1); i++ {
+		m[nums1[i]]++
+	}
+	for j := 0; j < len(nums2); j++ {
+		fmt.Println(m[nums2[j]])
+		if val, ok := m[nums2[j]]; ok {
+			if val >= 1 {
+				m[nums2[j]] -= 1
+				array = append(array, nums2[j])
+			}
+		}
+	}
+	return array
+}
+
+// Учитывая два целочисленных массива preorder, inorderгде preorder—
+// предварительный обход двоичного дерева, а inorder— неупорядоченный обход того же дерева, постройте и верните двоичное дерево .
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func buildTree(preorder []int, inorder []int) *TreeNode {
+	if len(preorder) == 0 {
+		return nil
+	}
+	i := 0
+	for preorder[0] != inorder[i] {
+		i++
+	}
+	return &TreeNode{preorder[0], buildTree(preorder[1:i+1], inorder[:i]), buildTree(preorder[i+1:], inorder[i+1:])}
+}
+
+func main() {
+	fmt.Println(buildTree([]int{3, 9, 20, 15, 7}, []int{9, 3, 15, 20, 7}))
+}
+
+// Учитывая rootдвоичное дерево и целое число targetSum, возвратите true, если дерево имеет путь от корня к листу,
+// так что сложение всех значений вдоль пути равно targetSum.
+// Лист — это узел, не имеющий дочерних элементов .
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func hasPathSum(root *TreeNode, targetSum int) bool {
+	var result = false
+	Helper(root, targetSum, &result)
+
+	return result
+
+}
+
+func Helper(root *TreeNode, targetSum int, result *bool) {
+	if *result == true {
+		*result = true
+	}
+	if root == nil {
+		return
+	}
+	if root.Left != nil {
+		root.Left.Val = root.Left.Val + root.Val
+		Helper(root.Left, targetSum, result)
+	}
+	if root.Right != nil {
+		root.Right.Val = root.Right.Val + root.Val
+		Helper(root.Right, targetSum, result)
+	}
+	if root.Right == nil && root.Left == nil {
+		if root.Val == targetSum {
+			*result = true
+		}
+
+	}
+	return
+}
+
+// Given the root of a binary tree, return the preorder traversal of its nodes' values.
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+type Sl struct {
+	array []int
+}
+
+func preorderTraversal(root *TreeNode) []int {
+	arr := Sl{}
+	arr.helper(root)
+
+	return arr.array
+}
+
+func (arr *Sl) helper(root *TreeNode) {
+	if root != nil {
+		arr.array = append(arr.array, root.Val)
+		arr.helper(root.Left)
+		arr.helper(root.Right)
+	}
+}
+
+// Given the root of a binary tree, return the postorder traversal of its nodes' values.
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+type Sl struct {
+	array []int
+}
+
+func postorderTraversal(root *TreeNode) []int {
+	arr := Sl{}
+	arr.helper(root)
+	return arr.array
+}
+
+func (arr *Sl) helper(root *TreeNode) {
+	if root != nil {
+		arr.helper(root.Left)                   // Рекурсивно обходим левое поддерево
+		arr.helper(root.Right)                  // Рекурсивно обходим правое поддерево
+		arr.array = append(arr.array, root.Val) // Посещаем корневой узел
+	}
+}
+
+// Given a string path, which is an absolute path (starting with a slash '/') to a file or directory in a Unix-style file system, convert it to the simplified canonical path.
+
+// In a Unix-style file system, a period '.' refers to the current directory, a double period '..' refers to the directory up a level, and any multiple consecutive slashes (i.e. '//') are treated as a single slash '/'. For this problem, any other format of periods such as '...' are treated as file/directory names.
+
+// The canonical path should have the following format:
+
+// The path starts with a single slash '/'.
+// Any two directories are separated by a single slash '/'.
+// The path does not end with a trailing '/'.
+// The path only contains the directories on the path from the root directory to the target file or directory (i.e., no period '.' or double period '..')
+// Return the simplified canonical path.
+
+func simplifyPath(p string) string {
+	return path.Clean(p)
+}
+
+// Given an m x n integer matrix matrix, if an element is 0, set its entire row and column to 0's.
+
+func setZeroes(matrix [][]int) {
+	var index []int
+	var str []int
+	razmer := len(matrix)
+	razmerstr := len(matrix[0])
+	for i := 0; i < razmer; i++ {
+		for j := 0; j < razmerstr; j++ {
+			if matrix[i][j] == 0 {
+				index = append(index, j)
+				str = append(str, i)
+			}
+		}
+	}
+	for i := 0; i < razmer; i++ {
+		for j := 0; j < len(index); j++ {
+			matrix[i][index[j]] = 0
+		}
+	}
+	for i := 0; i < len(str); i++ {
+		for j := 0; j < len(matrix[str[i]]); j++ {
+			matrix[str[i]][j] = 0
+		}
+	}
+	fmt.Println(matrix)
+}
+
+// Given two integers n and k, return all possible combinations of k numbers chosen from the range [1, n].
+
+// You may return the answer in any order.
+
+func combine(n int, k int) [][]int {
+	res, arr, i := [][]int{}, make([]int, k), 0
+
+	for i >= 0 {
+		arr[i]++
+		if arr[i] > n {
+			i--
+		} else if i == k-1 {
+			res = append(res, append([]int{}, arr...))
+		} else {
+			i++
+			arr[i] = arr[i-1]
+		}
+	}
+
+	return res
 }
