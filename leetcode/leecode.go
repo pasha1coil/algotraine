@@ -1723,3 +1723,139 @@ func combine(n int, k int) [][]int {
 
 	return res
 }
+
+// Given the root of a binary tree, return the inorder traversal of its nodes' values.
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func inorderTraversal(root *TreeNode) []int {
+	if root == nil {
+		return []int{}
+	}
+	var arr []int
+	helper(root, &arr)
+	return arr
+}
+
+func helper(root *TreeNode, arr *[]int) {
+	if root == nil {
+		return
+	}
+	helper(root.Left, arr)
+	*arr = append(*arr, root.Val)
+	helper(root.Right, arr)
+}
+
+// Given the root of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+var answer bool
+
+func isSymmetric(root *TreeNode) bool {
+	answer = true
+	if root != nil {
+		recurseSymmetric(root.Left, root.Right)
+	}
+	return answer
+}
+
+func recurseSymmetric(root1, root2 *TreeNode) {
+	if root1 == nil && root2 == nil || answer == false {
+		return
+	}
+	if root1 == nil || root2 == nil || root1.Val != root2.Val {
+		answer = false
+		return
+	}
+	recurseSymmetric(root1.Left, root2.Right)
+	recurseSymmetric(root1.Right, root2.Left)
+}
+
+// Given an integer rowIndex, return the rowIndexth (0-indexed) row of the Pascal's triangle.
+
+// In Pascal's triangle, each number is the sum of the two numbers directly above it as shown:
+
+func getRow(rowIndex int) []int {
+	row := make([]int, rowIndex+1)
+	row[0] = 1
+	for i := 1; i <= rowIndex; i++ {
+		tmp := uint64(row[i-1])
+		tmp = tmp * uint64(rowIndex+1-i)
+		tmp = tmp / uint64(i)
+		fmt.Println(row)
+		row[i] = int(tmp)
+	}
+	return row
+}
+
+// Given a binary tree, find its minimum depth.
+
+// The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.
+
+func minDepth(root *TreeNode) int {
+	k := math.MaxInt64
+	find(root, &k, 0)
+	if k == math.MaxInt64 {
+		return 0
+	}
+	return k
+}
+
+func find(root *TreeNode, re *int, cur int) {
+	if root == nil {
+		return
+	}
+	if root.Left != nil {
+		find(root.Left, re, cur+1)
+		// return
+	}
+	if root.Right != nil {
+		find(root.Right, re, cur+1)
+		// return
+	}
+	if root.Right == nil && root.Left == nil {
+		if cur+1 < *re {
+			*re = cur + 1
+		}
+		return
+	}
+}
+
+// Write an algorithm to determine if a number n is happy.
+
+// A happy number is a number defined by the following process:
+
+// Starting with any positive integer, replace the number by the sum of the squares of its digits.
+// Repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle which does not include 1.
+// Those numbers for which this process ends in 1 are happy.
+// Return true if n is a happy number, and false if not.
+
+func isHappy(n int) bool {
+	switch n {
+	case 1:
+		return true
+	case 0, 2, 3, 4, 5, 6, 8, 9:
+		return false
+	default:
+		return isHappy(Helper(n))
+	}
+}
+
+func Helper(n int) int {
+	var out int
+	var last int
+	for n > 0 {
+		last = n % 10
+		out += last * last
+		n /= 10
+	}
+	return out
+}
