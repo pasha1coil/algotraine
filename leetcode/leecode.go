@@ -6,6 +6,7 @@ import (
 	"math"
 	"path"
 	"sort"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -1858,4 +1859,622 @@ func Helper(n int) int {
 		n /= 10
 	}
 	return out
+}
+
+// Given the head of a linked list and an integer val, remove all the nodes of the linked list that has
+// Node.val == val, and return the new head.
+
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func removeElements(head *ListNode, val int) *ListNode {
+	if head == nil {
+		return nil
+	}
+	head.Next = removeElements(head.Next, val)
+	fmt.Println(head.Next)
+	if head.Val == val {
+		return head.Next
+	}
+	return head
+}
+
+// Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.
+
+// You must write an algorithm that runs in O(n) time
+
+func longestConsecutive(nums []int) int {
+	m := make(map[int]struct{}, len(nums))
+	for _, n := range nums {
+		m[n] = struct{}{}
+	}
+	var longest int
+	for n, _ := range m {
+		if _, ok := m[n-1]; !ok {
+			length := 1
+			for {
+				if _, ok := m[n+length]; !ok {
+					break
+				}
+				delete(m, n+length)
+				length++
+			}
+			if length > longest {
+				longest = length
+			}
+		}
+	}
+	return longest
+}
+
+// Given the heads of two singly linked-lists headA and headB,
+// return the node at which the two lists intersect. If the two linked lists have no intersection at all, return null.
+
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func getIntersectionNode(headA, headB *ListNode) *ListNode {
+	seen := make(map[*ListNode]bool)
+	for n := headA; n != nil; n = n.Next {
+		seen[n] = true
+	}
+
+	for n := headB; n != nil; n = n.Next {
+		if seen[n] {
+			return n
+		}
+	}
+	return nil
+}
+
+// Given the root of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func levelOrder(root *TreeNode) [][]int {
+	if root == nil {
+		return [][]int{}
+	}
+	res := [][]int{}
+	Helper(root, &res, 0)
+	return res
+}
+
+func Helper(root *TreeNode, arr *[][]int, count int) {
+	if root == nil {
+		return
+	}
+	if len(*arr) == count {
+		*arr = append(*arr, []int{})
+	}
+	(*arr)[count] = append(((*arr)[count]), root.Val)
+
+	Helper(root.Left, arr, count+1)
+	Helper(root.Right, arr, count+1)
+}
+
+// A binary tree's maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func maxDepth(root *TreeNode) int {
+	if root == nil {
+		return 0
+	}
+
+	leftDepth := maxDepth(root.Left)
+	rightDepth := maxDepth(root.Right)
+
+	return int(math.Max(float64(leftDepth), float64(rightDepth))) + 1
+}
+
+// Given the root of a binary tree, invert the tree, and return its root.
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func invertTree(root *TreeNode) *TreeNode {
+	if root == nil {
+		return root
+	}
+	left := root.Right
+	right := root.Left
+
+	root.Left = left
+	root.Right = right
+	invertTree(root.Left)
+	invertTree(root.Right)
+	return root
+}
+
+// Given the root of a binary tree, return the sum of all left leaves.
+
+// A leaf is a node with no children. A left leaf is a leaf that is the left child of another node.
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func sumOfLeftLeaves(root *TreeNode) int {
+
+	count := 0
+	if root.Left != nil && root.Left.Left != nil && root.Right != nil {
+		count += root.Left.Val
+	}
+	return count + sumOfLeftLeaves(root.Left) + sumOfLeftLeaves(root.Right)
+}
+
+// Given a binary tree, determine if it is
+// height-balanced.
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func isBalanced(root *TreeNode) bool {
+	if root == nil {
+		return true
+	}
+	Left := maxDepth(root.Left)
+	Right := maxDepth(root.Right)
+
+	if abs(Left-Right) > 1 {
+		return false
+	}
+
+	return isBalanced(root.Left) && isBalanced(root.Right)
+}
+
+func maxDepth(root *TreeNode) int {
+	if root == nil {
+		return 0
+	}
+
+	left := maxDepth(root.Left)
+	right := maxDepth(root.Right)
+
+	return int(math.Max(float64(left), float64(right))) + 1
+}
+
+func abs(a int) int {
+	if a > 0 {
+		return a
+	}
+	return -a
+}
+
+// Given an integer array nums where the elements are sorted in ascending order, convert it to a
+// height-balanced binary search tree.
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func sortedArrayToBST(nums []int) *TreeNode {
+	if len(nums) == 0 {
+		return nil
+	}
+	mid := len(nums) / 2
+	root := &TreeNode{Val: mid}
+	root.Left = sortedArrayToBST(nums[:mid])
+	root.Right = sortedArrayToBST(nums[mid:])
+	return root
+}
+
+// Given an integer columnNumber, return its corresponding column title as it appears in an Excel sheet.
+
+func convertToTitle(columnNumber int) string {
+	var result string
+	for columnNumber > 0 {
+		columnNumber--
+		charCode := 'A' + rune(columnNumber%26)
+		result = string(charCode) + result
+		columnNumber /= 26
+	}
+	return result
+}
+
+// Remove Duplicates from Sorted Array II
+
+func removeDuplicates(nums []int) int {
+	if len(nums) < 2 {
+		return len(nums)
+	}
+	idx := 2
+	for i := 2; i < len(nums); i++ {
+		if nums[i] != nums[idx-2] {
+			nums[idx] = nums[i]
+			idx += 1
+
+		}
+	}
+	fmt.Println(nums)
+	return idx
+}
+
+// Given the root of a binary tree, return
+// the bottom-up level order traversal of its nodes' values. (i.e., from left to right, level by level from leaf to root).
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func levelOrderBottom(root *TreeNode) [][]int {
+	if root == nil {
+		return [][]int{}
+	}
+	q := []*TreeNode{root}
+	res := [][]int{}
+	for len(q) > 0 {
+		size := len(q)
+		arr := []int{}
+		for i := 0; i < size; i++ {
+			target := q[0]
+			q = q[1:]
+
+			arr = append(arr, target.Val)
+
+			if target.Left != nil {
+				q = append(q, target.Left)
+			}
+			if target.Right != nil {
+				q = append(q, target.Right)
+			}
+		}
+		res = append(res, arr)
+	}
+
+	i := 0
+	j := len(res) - 1
+
+	for i < j {
+		res[i], res[j] = res[j], res[i]
+		i++
+		j--
+	}
+
+	return res
+}
+
+// You are given a perfect binary tree where all leaves are on the same level, and every parent has two children. The binary tree has the following definition:
+
+// struct Node {
+//   int val;
+//   Node *left;
+//   Node *right;
+//   Node *next;
+// }
+// Populate each next pointer to point to its next right node. If there is no next right node, the next pointer should be set to NULL.
+
+// Initially, all next pointers are set to NULL.
+
+func connect(root *Node) *Node {
+	if root == nil {
+		return root
+	}
+
+	q := []*Node{root}
+	for len(q) > 0 {
+		size := len(q)
+		for i := 0; i < size; i++ {
+			target := q[0]
+			q = q[1:]
+			if i < size-1 {
+				target.Next = q[0]
+			}
+			if target.Left != nil {
+				q = append(q, target.Left)
+			}
+			if target.Right != nil {
+				q = append(q, target.Right)
+
+			}
+		}
+	}
+	return root
+}
+
+// Given the root of a binary tree, return the zigzag level order traversal of its nodes'
+//  values. (i.e., from left to right, then right to left for the next level and alternate between).
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func zigzagLevelOrder(root *TreeNode) [][]int {
+	if root == nil {
+		return [][]int{}
+	}
+	q := []*TreeNode{root}
+	res := [][]int{}
+	count := 0
+
+	for len(q) > 0 {
+		size := len(q)
+		arr := []int{}
+		for i := 0; i < size; i++ {
+			target := q[0]
+			q = q[1:]
+			arr = append(arr, target.Val)
+			if target.Left != nil {
+				q = append(q, target.Left)
+			}
+			if target.Right != nil {
+				q = append(q, target.Right)
+			}
+		}
+		count++
+		if count%2 == 0 {
+			k, m := 0, len(arr)-1
+			for k < m {
+				arr[k], arr[m] = arr[m], arr[k]
+				k++
+				m--
+			}
+			res = append(res, arr)
+		} else {
+			res = append(res, arr)
+		}
+	}
+	return res
+}
+
+// Given the root of a binary tree and an integer targetSum, return all root-to-leaf paths where the sum of
+// the node values in the path equals targetSum. Each path should be returned as a list of the node values, not node references.
+
+// A root-to-leaf path is a path starting from the root and ending at any leaf node. A leaf is a node with no children.
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func pathSum(root *TreeNode, targetSum int) [][]int {
+	var paths [][]int
+	var currentPath []int
+
+	pathSumHelper(root, targetSum, 0, currentPath, &paths)
+
+	return paths
+}
+
+func pathSumHelper(node *TreeNode, targetSum int, currentSum int, currentPath []int, paths *[][]int) {
+	if node == nil {
+		return
+	}
+
+	currentSum += node.Val
+	currentPath = append(currentPath, node.Val)
+
+	if node.Left == nil && node.Right == nil && currentSum == targetSum {
+		newPath := make([]int, len(currentPath))
+		copy(newPath, currentPath)
+		*paths = append(*paths, newPath)
+	}
+
+	pathSumHelper(node.Left, targetSum, currentSum, currentPath, paths)
+	pathSumHelper(node.Right, targetSum, currentSum, currentPath, paths)
+
+	currentPath = currentPath[:len(currentPath)-1]
+}
+
+// Given the root of a binary tree, determine if it is a valid binary search tree (BST).
+
+// A valid BST is defined as follows:
+
+// The left
+// subtree
+//  of a node contains only nodes with keys less than the node's key.
+// The right subtree of a node contains only nodes with keys greater than the node's key.
+// Both the left and right subtrees must also be binary search trees.
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func isValidBST(root *TreeNode) bool {
+	return isValid(root, nil, nil)
+
+}
+
+func isValid(r *TreeNode, min, max *int) bool {
+	if r == nil {
+		return true
+	}
+
+	if min != nil && r.Val <= *min {
+		return false
+	}
+	if max != nil && r.Val >= *max {
+		return false
+	}
+	return isValid(r.Left, min, &r.Val) && isValid(r.Right, &r.Val, max)
+}
+
+// You are given the root of a binary search tree (BST), where the values of exactly two nodes of the tree were swapped by mistake.
+// Recover the tree without changing its structure.
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func recoverTree(root *TreeNode) {
+	var first, second, prev *TreeNode
+
+	recoverTreeHelper(root, &first, &second, &prev)
+
+	first.Val, second.Val = second.Val, first.Val
+}
+
+func recoverTreeHelper(node *TreeNode, first, second, prev **TreeNode) {
+	if node == nil {
+		return
+	}
+
+	recoverTreeHelper(node.Left, first, second, prev)
+
+	if *prev != nil && (*prev).Val >= node.Val {
+		if *first == nil {
+			*first = *prev
+		}
+		*second = node
+	}
+
+	*prev = node
+
+	recoverTreeHelper(node.Right, first, second, prev)
+}
+
+// Given the root of a binary tree, return all root-to-leaf paths in any order.
+
+// A leaf is a node with no children.
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func binaryTreePaths(root *TreeNode) []string {
+	result := []string{}
+
+	if root.Left != nil {
+		result = append(result, binaryTreePaths(root.Left)...)
+	}
+	if root.Right != nil {
+		result = append(result, binaryTreePaths(root.Right)...)
+	}
+	if len(result) == 0 {
+		result = append(result, strconv.Itoa(root.Val))
+	} else {
+		for i, item := range result {
+			result[i] = strconv.Itoa(root.Val) + "->" + item
+		}
+	}
+
+	return result
+}
+
+// You are given two strings s and t.
+
+// String t is generated by random shuffling string s and then add one more letter at a random position.
+
+// Return the letter that was added to t.
+
+func findTheDifference(s string, t string) byte {
+	dict := make(map[rune]int)
+	dict2 := make(map[rune]int)
+	var res byte
+	for _, i := range s {
+		dict[i]++
+	}
+	for _, i := range t {
+		dict2[i]++
+	}
+	for i, v := range dict2 {
+		fmt.Println(string(i), v)
+		if c, ok := dict[i]; !ok || v != c {
+			fmt.Println(string(i))
+			return byte(i)
+		}
+
+	}
+	return res
+}
+
+// Given an array nums of n integers where nums[i] is in the range [1, n],
+// return an array of all the integers in the range [1, n] that do not appear in nums.
+
+func findDisappearedNumbers(nums []int) []int {
+	var res []int
+	dict := make(map[int]bool)
+	for _, v := range nums {
+		dict[v] = true
+	}
+	i := 1
+	for i < len(nums) {
+		if !dict[i] {
+			res = append(res, i)
+		}
+	}
+	return res
+}
+
+// Given an array of strings words, return the words that can be typed using letters of the alphabet on only one row of American keyboard like the image below.
+
+// In the American keyboard:
+
+// the first row consists of the characters "qwertyuiop",
+// the second row consists of the characters "asdfghjkl", and
+// the third row consists of the characters "zxcvbnm".
+
+func findWords(words []string) []string {
+	str1 := make(map[rune]bool)
+	str2 := make(map[rune]bool)
+	str3 := make(map[rune]bool)
+	for _, v := range "qwertyuiop" {
+		str1[v] = true
+	}
+	for _, v := range "asdfghjkl" {
+		str2[v] = true
+	}
+	for _, v := range "zxcvbnm" {
+		str3[v] = true
+	}
+	var res []string
+	for i := 0; i < len(words); i++ {
+		low := strings.ToLower(words[i])
+		for j, v := range low {
+			if !str1[v] {
+				break
+			} else if j == len(words[i])-1 {
+				res = append(res, words[i])
+			}
+		}
+		for j, v := range low {
+			if !str2[v] {
+				break
+			} else if j == len(words[i])-1 {
+				res = append(res, words[i])
+			}
+		}
+		for j, v := range low {
+			if !str3[v] {
+				break
+			} else if j == len(words[i])-1 {
+				res = append(res, words[i])
+			}
+		}
+	}
+	return res
 }
